@@ -1,0 +1,111 @@
+---
+title: "AbdurahmanAhmed_8.3_Multiple-view layout.RMD"
+author: "Abdul Ahmed"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+1) Load packages, data and create a grouped histogram
+```{r plot1}
+#Install and Load Required packages
+library(dplyr)
+library(colorspace)
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+n <- 12
+
+#create first color vector
+col1=colorspace::diverge_hcl(n)
+
+#import and read data
+CrimeRate <- read.csv("C:\\Users\\AOAhm\\OneDrive\\Documents\\Data Optimization Class\\Sampledata2.csv")
+head(CrimeRate)
+
+#Break the variable "CrimeRate" into three groups based on the range
+
+CrimeRate <- CrimeRate %>%
+  select(CrimeRate, Year) %>%
+  mutate(type = case_when(
+    CrimeRate < 250 ~ "CrimeRate < 250",
+    CrimeRate >= 250 & CrimeRate < 500 ~ "250 <= CrimeRate <= 500",
+    CrimeRate >= 500 ~ "CrimeRate > 500"
+  ))
+
+
+```
+```{r}
+
+ggplot(data = CrimeRate, aes(x = CrimeRate, fill = as.factor(Year))) +
+geom_histogram(position = "dodge",  binwidth = 100) +
+scale_fill_manual(values = col1) +
+labs(title = "Figure 1: A histogram of Crime Rate over USA", x = "Crime rate per 100,1000 people", y = "Count", fill ="year") +
+theme_classic()
+```
+
+2) A scatter plot
+
+```{r plot2}
+summary_table = CrimeRate %>%
+  group_by(Year) %>%
+  summarise(
+    Mean_CrimeRate = mean(CrimeRate),
+    Max_CrimeRate = max(CrimeRate),
+    Min_CrimeRate = min(CrimeRate),
+  )
+
+```
+
+```{r}
+
+ggplot(data = summary_table, aes(x = Year, y = Mean_CrimeRate)) +
+  geom_line(color = "blue", linewidth = 0.5) +
+  geom_point(color = "blue", size = 5) +
+  labs(title = "Figure 2: A scatter plot between crime rate with year", x = "Year", y = "Mean Crime Rater per 100,1000 people over USA")
+```
+
+3) A grouped box plot
+
+```{r plot3}
+
+ggplot(data = CrimeRate, aes(x=Year, y=CrimeRate, fill=as.factor(Year)))+
+  geom_boxplot(outlier.colour="red", outlier.shape =8, outlier.size =2) +
+  labs(title = "Figure 3: A box plot crime rate with year", x = "Year", y = "Mean Crime Rater per 100,1000 people over USA")+
+  theme()
+
+
+```
+
+4) All three graphs in one plot
+```{r combined plots}
+p1 <- ggplot(data = CrimeRate, aes(x = CrimeRate, fill = as.factor(Year))) +
+geom_histogram(position = "dodge",  binwidth = 100) +
+scale_fill_manual(values = col1) +
+labs(title = "Figure 1: A histogram of Crime Rate over USA", x = "Crime rate per 100,1000 people", y = "Count", fill ="year") +
+theme_classic()
+
+p2 <- ggplot(data = summary_table, aes(x = Year, y = Mean_CrimeRate)) +
+  geom_line(color = "blue", linewidth = 0.5) +
+  geom_point(color = "blue", size = 5) +
+  labs(title = "Figure 2: A scatter plot between crime rate with year", x = "Year", y = "Mean Crime Rater per 100,1000 people over USA")
+
+p3 <- ggplot(data = CrimeRate, aes(x=Year, y=CrimeRate, fill=as.factor(Year)))+
+  geom_boxplot(outlier.colour="red", outlier.shape =8, outlier.size =2) +
+  labs(title = "Figure 3: A box plot crime rate with year", x = "Year", y = "Mean Crime Rater per 100,1000 people over USA")+
+  theme()
+
+g1 <- ggplotGrob(p1)
+g2 <- ggplotGrob(p2)
+g3 <- ggplotGrob(p3)
+
+grid.arrange(g1, g2, g3, widths = c(2,1))
+```
+
+
+  
