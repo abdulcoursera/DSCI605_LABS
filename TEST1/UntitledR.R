@@ -1,3 +1,3 @@
-TEST LIN
+TEST
 T1
 T2
