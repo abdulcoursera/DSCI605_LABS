@@ -1,3 +1,3 @@
-TEST
-T1
-T2
+library(islr)
+data1 = iris
+head(data1)
